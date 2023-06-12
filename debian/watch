@@ -1,0 +1,12 @@
+version=4
+opts=dversionmangle=s/\+debian\d*$//,uversionmangle=s/&#48\x3b/0/g \
+http://download.camlcity.org/download/findlib-(\d+\..*)\.tar\.gz
+# TODO: the git version below is better: it's available over HTTPS and does not
+# contain pre-build documentation that exists in the release tarball. In Debian
+# we are *supposed* to rebuild this documentation, but that requires a load of
+# extra build dependencies, some of which aren't in Debian atm. The original
+# packager should have done this; and I don't have time for that atm, I just
+# want to upgrade the OCaml compiler.
+#version=4
+#opts=filenamemangle=s/.*ref=@PACKAGE@-(.*)$/@PACKAGE@-$1.tar.gz/ \
+#https://gitlab.camlcity.org/gerd/lib-findlib/tags .*/archive.tar.gz\?ref=@PACKAGE@-(.*)

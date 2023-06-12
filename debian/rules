@@ -1,4 +1,58 @@
 #!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+include /usr/share/ocaml/ocamlvars.mk
 
 %:
-	dh $@
+	dh $@ --with ocaml,bash-completion
+
+.PHONY: override_dh_auto_configure
+override_dh_auto_configure:
+	./configure \
+		-config /etc/ocamlfind.conf \
+		-bindir /usr/bin \
+		-sitelib $(OCAML_STDLIB_DIR) \
+		-mandir /usr/share/man \
+		-no-camlp4 \
+		-with-toolbox
+	sed -i '/INSTALLFILE/s/.*/INSTALLFILE = cp/' Makefile.config
+
+.PHONY: override_dh_auto_build
+override_dh_auto_build:
+	$(MAKE)
+ifeq ($(OCAML_HAVE_OCAMLOPT),yes)
+	$(MAKE) opt
+endif
+
+# Some platforms don't have raw_spacetime, do the same check as ./configure
+ifeq (,$(wildcard $(OCAML_STDLIB_DIR)/raw_spacetime_lib.cmxa))
+  OCAMLINIT_SED += -e '\,raw_spacetime/META,d'
+endif
+
+export OCAMLINIT_SED
+
+.PHONY: override_dh_auto_install
+override_dh_auto_install:
+	$(MAKE) install prefix=$(CURDIR)/debian/tmp
+# rm ocamlc.opt and similar settings, they're not avail everywhere in debian
+	grep -v \\.opt debian/tmp/etc/ocamlfind.conf > debian/ocamlfind.conf.new
+	sed -i -e 's/@OCamlABI@/$(OCAML_ABI)/g' debian/ocamlfind.conf.new
+	mv debian/ocamlfind.conf.new debian/tmp/etc/ocamlfind.conf
+# rm empty man3 dir
+	test -d $(CURDIR)/debian/tmp/usr/share/man/man3 && \
+		rmdir $(CURDIR)/debian/tmp/usr/share/man/man3
+
+# do not strip executables on bytecode executables (is this still needed?)
+ifneq ($(OCAML_HAVE_OCAMLOPT),yes)
+.PHONY: override_dh_strip
+override_dh_strip:
+endif
+
+.PHONY: override_dh_auto_clean
+override_dh_auto_clean:
+	if [ -f Makefile.config ]; then $(MAKE) clean; fi
+	-rm -f Makefile.config ocargs.log src/findlib/ocaml_args.ml
+	-rm -Rf site-lib-src/camlp4/
