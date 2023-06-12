@@ -1,0 +1,16 @@
+etc/ocamlfind.conf
+@OCamlStdlibDir@/findlib/META
+@OCamlStdlibDir@/findlib/findlib.cma
+@OCamlStdlibDir@/findlib/findlib_dynload.cma
+DYN: @OCamlStdlibDir@/findlib/findlib.cmxs
+DYN: @OCamlStdlibDir@/findlib/findlib_dynload.cmxs
+@OCamlStdlibDir@/ocamldoc/META
+@OCamlStdlibDir@/dynlink/META
+@OCamlStdlibDir@/str/META
+@OCamlStdlibDir@/stdlib/META
+@OCamlStdlibDir@/bytes/META
+@OCamlStdlibDir@/unix/META
+@OCamlStdlibDir@/bigarray/META
+@OCamlStdlibDir@/compiler-libs/META
+@OCamlStdlibDir@/threads/META
+@OCamlStdlibDir@/raw_spacetime/META
